@@ -8,6 +8,10 @@ import 'package:path/path.dart';
 import 'package:sqlite_viewer/sqlite_viewer.dart';
 import 'package:texteditor/recent_files.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:clipboard/clipboard.dart';
+import 'package:intl/intl.dart';
+// import 'package:utf/utf.dart';
+
 
 import 'bookmarks.dart';
 import 'db.dart';
@@ -98,6 +102,21 @@ class _MyHomePageState extends State<MyHomePage> {
   EncodingType selectedEncoding = EncodingType.utf16be;
   int tabsCount = 2;
   String savedFileName = '';
+  bool isDetectChanges = false;
+  List monthLabels = [
+    'янв.',
+    'февр.',
+    'мар.',
+    'апр.',
+    'мая',
+    'июн.',
+    'июл.',
+    'авг.',
+    'сен.',
+    'окт.',
+    'ноя.',
+    'дек.'
+  ];
   late DatabaseHandler handler;
 
   Future<String> get _localPath async {
@@ -196,12 +215,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   createFile() async {
-     // String appDir = (await getApplicationDocumentsDirectory()).path;
-     String appDir = await _localPath;
+     /*String appDir = await _localPath;
      String filePath = '${appDir}/flutter_text_plain_2.txt';
      var myFile = new File(filePath);
      myFile.createSync();
-     myFile.writeAsString("abc");
+     myFile.writeAsString("abc");*/
   }
 
   openFindDialog(context) {
@@ -345,7 +363,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (isAddPrefix) {
       rawCurrentDateMonth = '0${rawCurrentDateMonth}';
     }
-    int rawCurrentDateHoursLength = rawCurrentDateHours.length;
+    /*int rawCurrentDateHoursLength = rawCurrentDateHours.length;
     isAddPrefix = rawCurrentDateHoursLength < 10;
     if (isAddPrefix) {
       rawCurrentDateHours = '0${rawCurrentDateHours}';
@@ -359,19 +377,30 @@ class _MyHomePageState extends State<MyHomePage> {
     isAddPrefix = rawCurrentDateSecondsLength < 10;
     if (isAddPrefix) {
       rawCurrentDateSeconds = '0${rawCurrentDateSeconds}';
+    }*/
+    int currentDateMonthIndex = currentDateMonth - 1;
+    String monthLabel = monthLabels[currentDateMonthIndex];
+    String currentDateFormat = DateFormat('a').format(currentDate);
+    var currentDateOffset = currentDate.timeZoneOffset;
+    var currentDateOffsetInHours = currentDateOffset.inHours > 0 ? currentDateOffset.inHours : 1;
+    String gmtLabel = '';
+    if (!currentDateOffset.isNegative) {
+      gmtLabel += '+' + currentDateOffset.inHours.toString().padLeft(2, '0') + ":" + (currentDateOffset.inMinutes % (currentDateOffsetInHours * 60)).toString().padLeft(2, '0');;
+    } else {
+      gmtLabel += '-' + (-currentDateOffset.inHours).toString().padLeft(2, '0') + ":" + (currentDateOffset.inMinutes % (currentDateOffsetInHours * 60)).toString().padLeft(2, '0');;
     }
-    String rawFirstTimeStamp = '';
-    String rawSecondTimeStamp = '';
-    String rawThirdTimeStamp = '';
-    String rawFourTimeStamp = '';
-    String rawFiveTimeStamp = '';
-    String rawSixTimeStamp = '';
-    String rawSevenTimeStamp = '';
-    String rawEightTimeStamp = '';
-    String rawNineTimeStamp = '';
-    String rawTenTimeStamp = '';
-    String rawElevenTimeStamp = '';
-    String rawTwelthTimeStamp = '';
+    String rawFirstTimeStamp = '${rawCurrentDateYear}/${rawCurrentDateMonth}/${rawCurrentDateDay} ${rawCurrentDateHours}:${rawCurrentDateMinutes}';
+    String rawSecondTimeStamp = '${rawCurrentDateYear}/${rawCurrentDateMonth}/${rawCurrentDateDay} ${rawCurrentDateHours}:${rawCurrentDateMinutes} ${currentDateFormat}';
+    String rawThirdTimeStamp = '${rawCurrentDateYear}/${rawCurrentDateMonth}/${rawCurrentDateDay} ${rawCurrentDateHours}:${rawCurrentDateMinutes}:${rawCurrentDateSeconds} GMT ${gmtLabel}';
+    String rawFourTimeStamp = '${rawCurrentDateMonth}/${rawCurrentDateDay}/${rawCurrentDateYear} ${rawCurrentDateHours}:${rawCurrentDateMinutes}';
+    String rawFiveTimeStamp = '${rawCurrentDateMonth}/${rawCurrentDateDay}/${rawCurrentDateYear} ${rawCurrentDateHours}:${rawCurrentDateMinutes} ${currentDateFormat}';
+    String rawSixTimeStamp = '${rawCurrentDateMonth}/${rawCurrentDateDay}/${rawCurrentDateYear} ${rawCurrentDateHours}:${rawCurrentDateMinutes}:${rawCurrentDateSeconds} GMT ${gmtLabel}';
+    String rawSevenTimeStamp = '${monthLabel}/${rawCurrentDateDay}/${rawCurrentDateYear} ${rawCurrentDateHours}:${rawCurrentDateMinutes}';
+    String rawEightTimeStamp = '${monthLabel}/${rawCurrentDateDay}/${rawCurrentDateYear} ${rawCurrentDateHours}:${rawCurrentDateMinutes} ${currentDateFormat}';
+    String rawNineTimeStamp = '${monthLabel}/${rawCurrentDateDay}/${rawCurrentDateYear} ${rawCurrentDateHours}:${rawCurrentDateMinutes}:${rawCurrentDateSeconds} GMT ${gmtLabel}';
+    String rawTenTimeStamp = '${rawCurrentDateDay}/${monthLabel}/${rawCurrentDateYear} ${rawCurrentDateHours}:${rawCurrentDateMinutes}';
+    String rawElevenTimeStamp = '${rawCurrentDateDay}/${monthLabel}/${rawCurrentDateYear} ${rawCurrentDateHours}:${rawCurrentDateMinutes} ${currentDateFormat}';
+    String rawTwelthTimeStamp = '${rawCurrentDateDay}/${monthLabel}/${rawCurrentDateYear} ${rawCurrentDateHours}:${rawCurrentDateMinutes}:${rawCurrentDateSeconds} GMT ${gmtLabel}';
     showDialog<String>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
@@ -577,13 +606,13 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: <Widget>[
           TextButton(
             onPressed: () {
-
+              return Navigator.pop(context, 'Cancel');
             },
             child: const Text('Отмена')
           ),
           TextButton(
             onPressed: () {
-
+              return Navigator.pop(context, 'Ok');
             },
             child: const Text('Готово')
           )
@@ -703,6 +732,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           TextButton(
             onPressed: () {
+              List<int> bytes = utf8.encode(mainTextAreaContent);
+              String convertedString = utf8.decode(bytes);
+              setState(() {
+                mainTextAreaContent = convertedString;
+              });
               return Navigator.pop(context, 'OK');
             },
             child: const Text('OK')
@@ -1155,12 +1189,21 @@ class _MyHomePageState extends State<MyHomePage> {
               }
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
                   'Имя файла'
                 ),
-                Text(
-                  savedFileName
+                Container(
+                  width: 120,
+                  child: TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        savedFileName = value;
+                      });
+                    },
+                  )
                 )
               ]
             )
@@ -1174,8 +1217,12 @@ class _MyHomePageState extends State<MyHomePage> {
             child: const Text('Отмена')
           ),
           TextButton(
-            onPressed: () {
-
+            onPressed: () async {
+              String appDir = await _localPath;
+              String filePath = '${appDir}/${savedFileName}';
+              var myFile = new File(filePath);
+              myFile.createSync();
+              myFile.writeAsString("abc");
               return Navigator.pop(context, 'OK');
             },
             child: const Text('Сохранить')
@@ -1196,6 +1243,7 @@ class _MyHomePageState extends State<MyHomePage> {
             setState(() {
               mainTextAreaContent = value;
               numLines = '\n'.allMatches(value).length + 1;
+              isDetectChanges = true;
             });
           },
           readOnly: isReadOnly,
@@ -1257,7 +1305,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 } else if (menuItemName.content == 'Открыть (SAF)') {
                   Navigator.pushNamed(context, '/file/open');
                 } else if (menuItemName.content == 'Сохранить') {
-                  openSaveDialog(context);
+                  if (isDetectChanges) {
+                    openSaveDialog(context);
+                  }
                 } else if (menuItemName.content == 'Сохранить как') {
                   Navigator.pushNamed(context, '/file/open');
                 } else if (menuItemName.content == 'Перезагрузить') {
@@ -1298,7 +1348,9 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               onSelected: (menuItemName) {
                 if (menuItemName.content == 'Вставить') {
-
+                  FlutterClipboard.paste().then((value) {
+                    print('clipboard: ${value}');
+                  });
                 } else if (menuItemName.content == 'Вставить цвет') {
                   openInsertColorDialog(context);
                 } else if (menuItemName.content == 'Вставить временную метку') {
@@ -1462,11 +1514,18 @@ class _MyHomePageState extends State<MyHomePage> {
                       Icons.save
                     ),
                     onPressed: () {
-                      openSaveDialog(context);
+                      if (isDetectChanges) {
+                        openSaveDialog(context);
+                      }
                     },
                     style: ButtonStyle(
                       foregroundColor: MaterialStateProperty.all<Color>(
-                        Color.fromARGB(255, 0, 0, 0)
+                        (
+                          isDetectChanges ?
+                            Color.fromARGB(255, 0, 0, 0)
+                          :
+                            Color.fromARGB(255, 200, 200, 200)
+                        )
                       )
                     )
                   ),

@@ -34,6 +34,9 @@ dependencies:
   sqflite:
   fluttertoast: ^8.0.9
   flutter_colorpicker: ^1.0.3
+  clipboard: ^0.1.3
+  intl: ^0.17.0
+#  utf: ^0.9.0+5
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
