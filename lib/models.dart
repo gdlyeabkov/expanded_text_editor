@@ -28,3 +28,42 @@ enum FileSortType {
   name,
   date
 }
+
+enum TimeStampType {
+  one,
+  two,
+  three,
+  four,
+  five,
+  six,
+  seven,
+  eight,
+  nine,
+  ten,
+  eleven,
+  twelth
+}
+
+enum EncodingType {
+  utf8,
+  utf16,
+  utf16be
+}
+
+enum StyleType {
+  Default,
+  GitHub,
+  GitHubv2,
+  Tommorow,
+  Hemisu,
+  AtelierCave,
+  AtelierDune,
+  AtelierEstuary,
+  AtelierForest,
+  AtelierHeath,
+  AtelierLakeside,
+  AtelierPlateau,
+  AtelierSavanna,
+  AtelierSeaside,
+  AtelierSulphurpool
+}
