@@ -326,7 +326,6 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: <Widget>[
           TextButton(
             onPressed: () {
-              print('проверка');
               setState(() {
                 mainTextAreaContent = mainTextAreaContent.replaceFirst(findDialogSearchContent, findDialogReplacementContent);
                 mainTextAreaController.text = mainTextAreaContent;
@@ -337,7 +336,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           TextButton(
             onPressed: () {
-              print('проверка');
               setState(() {
                 mainTextAreaContent = mainTextAreaContent.replaceAll(findDialogSearchContent, findDialogReplacementContent);
                 mainTextAreaController.text = mainTextAreaContent;
@@ -1481,7 +1479,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   });
                 } else if (menuItemName.content == 'Вставить') {
                   FlutterClipboard.paste().then((value) {
-                    print('clipboard: ${value}');
+                    setState(() {
+                      mainTextAreaContent += value;
+                      mainTextAreaController.text = mainTextAreaContent;
+                    });
                   });
                 } else if (menuItemName.content == 'Вставить цвет') {
                   openInsertColorDialog(context);
