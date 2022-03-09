@@ -172,13 +172,13 @@ class _OpenFilePageState extends State<OpenFilePage> {
                   notificationMsg = 'Фильтр файлов ОТКЛ';
                 }
                 Fluttertoast.showToast(
-                    msg: notificationMsg,
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
+                  msg: notificationMsg,
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white,
+                  fontSize: 16.0
                 );
               });
             }

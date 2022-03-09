@@ -11,7 +11,8 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:intl/intl.dart';
 // import 'package:utf/utf.dart';
-
+import 'package:hexcolor/hexcolor.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'bookmarks.dart';
 import 'db.dart';
@@ -67,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
   var penContextMenuBtns = {
     SoftTrackMenuItem(Icons.undo, 'Отменить'),
     SoftTrackMenuItem(Icons.redo, 'Повторить'),
-    SoftTrackMenuItem(Icons.select_all, 'Вылелить все'),
+    SoftTrackMenuItem(Icons.select_all, 'Выделить всё'),
     SoftTrackMenuItem(Icons.paste, 'Вставить'),
     SoftTrackMenuItem(Icons.brush, 'Вставить цвет'),
     SoftTrackMenuItem(Icons.access_time_outlined, 'Вставить временную метку'),
@@ -88,6 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
   };
   bool isSelectionMode = false;
   TextField mainTextArea = TextField();
+  late TextEditingController mainTextAreaController;
   String mainTextAreaContent = '';
   int numLines = 1;
   bool isReadOnly = false;
@@ -117,6 +119,9 @@ class _MyHomePageState extends State<MyHomePage> {
     'ноя.',
     'дек.'
   ];
+  Color selectedStyleColor = Color.fromARGB(255, 255, 255, 255);
+  String findDialogSearchContent = '';
+  String findDialogReplacementContent = '';
   late DatabaseHandler handler;
 
   Future<String> get _localPath async {
@@ -235,7 +240,9 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               TextField(
                 onChanged: (value) {
-
+                  setState(() {
+                    findDialogSearchContent = value;
+                  });
                 },
                 decoration: new InputDecoration.collapsed(
                   hintText: '',
@@ -253,7 +260,9 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               TextField(
                 onChanged: (value) {
-
+                  setState(() {
+                    findDialogReplacementContent = value;
+                  });
                 },
                 decoration: new InputDecoration.collapsed(
                   hintText: '',
@@ -317,21 +326,49 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: <Widget>[
           TextButton(
             onPressed: () {
-
+              print('проверка');
+              setState(() {
+                mainTextAreaContent = mainTextAreaContent.replaceFirst(findDialogSearchContent, findDialogReplacementContent);
+                mainTextAreaController.text = mainTextAreaContent;
+              });
+              return Navigator.pop(context, 'OK');
             },
             child: const Text('Заменить')
           ),
           TextButton(
             onPressed: () {
-
+              print('проверка');
+              setState(() {
+                mainTextAreaContent = mainTextAreaContent.replaceAll(findDialogSearchContent, findDialogReplacementContent);
+                mainTextAreaController.text = mainTextAreaContent;
+              });
+              return Navigator.pop(context, 'OK');
             },
             child: const Text('Заменить все')
           ),
           TextButton(
             onPressed: () {
-
+              int findIndex = mainTextAreaContent.indexOf(findDialogSearchContent);
+              if (findIndex != -1) {
+                int nextCharPosition = findIndex + 1;
+                mainTextAreaController.selection = TextSelection(
+                  baseOffset: findIndex,
+                  extentOffset: nextCharPosition
+                );
+              } else {
+                Fluttertoast.showToast(
+                  msg: 'Для \"${findDialogSearchContent}\" соответствий не найдено',
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white,
+                  fontSize: 16.0
+                );
+              }
+              return Navigator.pop(context, 'OK');
             },
-            child: const Text('Готово')
+            child: const Text('Найти')
           )
         ]
       )
@@ -612,6 +649,36 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           TextButton(
             onPressed: () {
+              String timeStamp = '';
+              if (selectedTimeStamp == TimeStampType.one) {
+                timeStamp = rawFirstTimeStamp;
+              } else if (selectedTimeStamp == TimeStampType.two) {
+                timeStamp = rawSecondTimeStamp;
+              } else if (selectedTimeStamp == TimeStampType.three) {
+                timeStamp = rawThirdTimeStamp;
+              } else if (selectedTimeStamp == TimeStampType.four) {
+                timeStamp = rawFourTimeStamp;
+              } else if (selectedTimeStamp == TimeStampType.five) {
+                timeStamp = rawFiveTimeStamp;
+              } else if (selectedTimeStamp == TimeStampType.six) {
+                timeStamp = rawSixTimeStamp;
+              } else if (selectedTimeStamp == TimeStampType.seven) {
+                timeStamp = rawSevenTimeStamp;
+              } else if (selectedTimeStamp == TimeStampType.eight) {
+                timeStamp = rawEightTimeStamp;
+              } else if (selectedTimeStamp == TimeStampType.nine) {
+                timeStamp = rawNineTimeStamp;
+              } else if (selectedTimeStamp == TimeStampType.ten) {
+                timeStamp = rawTenTimeStamp;
+              } else if (selectedTimeStamp == TimeStampType.eleven) {
+                timeStamp = rawElevenTimeStamp;
+              } else if (selectedTimeStamp == TimeStampType.twelth) {
+                timeStamp = rawTwelthTimeStamp;
+              }
+              setState(() {
+                mainTextAreaContent += timeStamp;
+                mainTextAreaController.text = mainTextAreaContent;
+              });
               return Navigator.pop(context, 'Ok');
             },
             child: const Text('Готово')
@@ -655,7 +722,14 @@ class _MyHomePageState extends State<MyHomePage> {
               'ОК'
             ),
             onPressed: () {
-              print('${pickerColor.hashCode}');
+              Color hexColor = ColorToHex(pickerColor);
+              String rawHexColor = hexColor.toString();
+              String hexColorCode = rawHexColor.substring(8, 16);
+              print('hexColorCode: ${hexColorCode}');
+              setState(() {
+                mainTextAreaContent += hexColorCode;
+                mainTextAreaController.text = mainTextAreaContent;
+              });
               return Navigator.pop(context, 'OK');
             }
           ),
@@ -784,6 +858,18 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           TextButton(
               onPressed: () {
+                int mainTextAreaContentLength = mainTextAreaContent.length;
+                int selectionLength = mainTextAreaContentLength;
+                setState(() {
+                  Iterable<Match> lines = '\n'.allMatches(mainTextAreaContent);
+                  int findIndex = mainTextAreaContent.indexOf('\n');
+                  if (findIndex != -1) {
+                    mainTextAreaController.selection = TextSelection(
+                      baseOffset: findIndex,
+                      extentOffset: findIndex
+                    );
+                  }
+                });
                 return Navigator.pop(context, 'OK');
               },
               child: const Text('OK')
@@ -1053,6 +1139,39 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           TextButton(
             onPressed: () {
+              setState(() {
+                if (selectedStyle == StyleType.Default) {
+                  selectedStyleColor = Color.fromARGB(255, 255, 255, 255);
+                } else if (selectedStyle == StyleType.GitHub) {
+                  selectedStyleColor = Color.fromARGB(255, 250, 250, 250);
+                } else if (selectedStyle == StyleType.GitHubv2) {
+                  selectedStyleColor = Color.fromARGB(255, 245, 245, 245);
+                } else if (selectedStyle == StyleType.Tommorow) {
+                  selectedStyleColor = Color.fromARGB(255, 240, 240, 240);
+                } else if (selectedStyle == StyleType.Hemisu) {
+                  selectedStyleColor = Color.fromARGB(255, 245, 245, 245);
+                } else if (selectedStyle == StyleType.AtelierCave) {
+                  selectedStyleColor = Color.fromARGB(255, 240, 240, 240);
+                } else if (selectedStyle == StyleType.AtelierDune) {
+                  selectedStyleColor = Color.fromARGB(255, 235, 235, 235);
+                } else if (selectedStyle == StyleType.AtelierEstuary) {
+                  selectedStyleColor = Color.fromARGB(255, 230, 230, 230);
+                } else if (selectedStyle == StyleType.AtelierForest) {
+                  selectedStyleColor = Color.fromARGB(255, 225, 225, 225);
+                } else if (selectedStyle == StyleType.AtelierHeath) {
+                  selectedStyleColor = Color.fromARGB(255, 220, 220, 220);
+                } else if (selectedStyle == StyleType.AtelierLakeside) {
+                  selectedStyleColor = Color.fromARGB(255, 215, 215, 215);
+                } else if (selectedStyle == StyleType.AtelierPlateau) {
+                  selectedStyleColor = Color.fromARGB(255, 210, 210, 210);
+                } else if (selectedStyle == StyleType.AtelierSavanna) {
+                  selectedStyleColor = Color.fromARGB(255, 205, 205, 205);
+                } else if (selectedStyle == StyleType.AtelierSeaside) {
+                  selectedStyleColor = Color.fromARGB(255, 200, 200, 200);
+                } else if (selectedStyle == StyleType.AtelierSulphurpool) {
+                  selectedStyleColor = Color.fromARGB(255, 195, 195, 195);
+                }
+              });
               return Navigator.pop(context, 'OK');
             },
             child: const Text('OK')
@@ -1238,7 +1357,11 @@ class _MyHomePageState extends State<MyHomePage> {
     this.handler = DatabaseHandler();
     this.handler.initializeDB().whenComplete(() async {
       setState(() {
+        mainTextAreaController = TextEditingController(
+          text: mainTextAreaContent
+        );
         mainTextArea = TextField(
+          controller: mainTextAreaController,
           onChanged: (value) {
             setState(() {
               mainTextAreaContent = value;
@@ -1347,7 +1470,16 @@ class _MyHomePageState extends State<MyHomePage> {
                 }).toList();
               },
               onSelected: (menuItemName) {
-                if (menuItemName.content == 'Вставить') {
+                if (menuItemName.content == 'Выделить всё') {
+                  int mainTextAreaContentLength = mainTextAreaContent.length;
+                  int selectionLength = mainTextAreaContentLength;
+                  setState(() {
+                    mainTextAreaController.selection = TextSelection(
+                      baseOffset: 0,
+                      extentOffset: selectionLength
+                    );
+                  });
+                } else if (menuItemName.content == 'Вставить') {
                   FlutterClipboard.paste().then((value) {
                     print('clipboard: ${value}');
                   });
@@ -1355,6 +1487,16 @@ class _MyHomePageState extends State<MyHomePage> {
                   openInsertColorDialog(context);
                 } else if (menuItemName.content == 'Вставить временную метку') {
                   openInsertTimeStampDialog(context);
+                } else if (menuItemName.content == 'Увеличить отступ') {
+                  setState(() {
+                    mainTextAreaContent = '\t${mainTextAreaContent}';
+                    mainTextAreaController.text = mainTextAreaContent;
+                  });
+                } else if (menuItemName.content == 'Уменьшить отступ') {
+                  setState(() {
+                    mainTextAreaContent = mainTextAreaContent.replaceFirst('\t', '');
+                    mainTextAreaController.text = mainTextAreaContent;
+                  });
                 }
               },
               child: Container(
@@ -1587,6 +1729,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       height: MediaQuery.of(context).size.height - 165,
                     ),
                     Container(
+                      decoration: BoxDecoration(
+                        color: selectedStyleColor
+                      ),
                       height: MediaQuery.of(context).size.height - 165,
                       width: MediaQuery.of(context).size.width - 25,
                       child: mainTextArea
