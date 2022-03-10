@@ -13,9 +13,14 @@ import 'package:intl/intl.dart';
 // import 'package:utf/utf.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:texteditor/settings.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_share/flutter_share.dart';
 
 import 'bookmarks.dart';
 import 'db.dart';
+import 'help.dart';
+import 'memory_manager.dart';
 import 'models.dart';
 import 'open_file.dart';
 
@@ -40,6 +45,9 @@ class MyApp extends StatelessWidget {
         '/file/open': (context) => OpenFilePage(title: 'title'),
         '/file/recent': (context) => RecentFilesPage(title: 'title'),
         '/bookmarks': (context) => BookmarksPage(title: 'title'),
+        '/manager': (context) => MemoryManagerPage(title: 'title'),
+        '/help': (context) => HelpPage(title: 'title'),
+        '/settings': (context) => SettingsPage(title: 'title'),
       }
     );
   }
@@ -1857,7 +1865,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ]
                     ),
                     onPressed: () {
-                      Navigator.pushNamed(context, '/file/open');
+                      Navigator.pushNamed(context, '/manager');
                     }
                   )
                 ]
@@ -1990,6 +1998,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     onPressed: () {
                       // Закрыть приложение
+                      SystemNavigator.pop();
+                      exit(0);
                     }
                   )
                 ]
