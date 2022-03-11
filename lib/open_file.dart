@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:texteditor/main.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:unicorndial/unicorndial.dart';
+import 'package:path/path.dart';
 
 import 'db.dart';
 import 'models.dart';
@@ -27,11 +31,20 @@ class _OpenFilePageState extends State<OpenFilePage> {
   FileSortType selectedFileSortType = FileSortType.name;
   String bookmarkName = '';
   String currentPath = '';
+  String filesAction = '';
+  List<Widget> files = [];
   late DatabaseHandler handler;
 
   Future<String> get _localPath async {
     final directory = await getTemporaryDirectory();
     return directory.path;
+  }
+
+  Future<List<FileSystemEntity>> getFiles() async {
+    String appDir = await _localPath;
+    Directory dir = new Directory(appDir);
+    Stream<FileSystemEntity> stream = dir.list();
+    return stream.toList();
   }
 
   openAddBookmarkDialog(context) {
@@ -90,6 +103,45 @@ class _OpenFilePageState extends State<OpenFilePage> {
     );
   }
 
+  addFile(FileSystemEntity record, context) {
+    String filePath = record.path;
+    String fileName = basename(filePath);
+    int fileSize = 0;
+    File rawFile = File(filePath);
+    bool isDir = new Directory(filePath).existsSync();
+    bool isNotDir = !isDir;
+    if (isNotDir) {
+      fileSize = rawFile.lengthSync();
+    }
+    Container file = Container(
+      height: 65,
+      child: Row(
+        children: [
+          Icon(
+            Icons.folder,
+            size: 36
+          ),
+          Container(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '${fileName}'
+                ),
+                Text(
+                  '$fileSize'
+                )
+              ]
+            ),
+            margin: EdgeInsets.only(
+              left: 15
+            )
+          )
+        ]
+      )
+    );
+    files.add(file);
+  }
 
   @override
   initState() {
@@ -104,10 +156,78 @@ class _OpenFilePageState extends State<OpenFilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final arguments = ModalRoute.of(context)!.settings.arguments as Map;
+    if (arguments != null) {
+      print(arguments['filesAction']);
+      filesAction = arguments['filesAction'];
+    }
+    final List<UnicornButton> floatingButtons = [];
+    if (filesAction == 'Сохранить как') {
+      floatingButtons.add(
+        UnicornButton(
+          hasLabel: true,
+          labelText: 'Сохранить как',
+          labelBackgroundColor: Color.fromARGB(255, 100, 100, 100),
+          labelColor: Colors.white,
+          currentButton: FloatingActionButton(
+            heroTag: 'Сохранить как',
+            backgroundColor: Color.fromARGB(255, 0, 185, 0),
+            mini: true,
+            child: Icon(Icons.save),
+            onPressed: () {
+              print('Сохранить как');
+            },
+          ),
+        ),
+      );
+    } else {
+      floatingButtons.add(
+        UnicornButton(
+          hasLabel: true,
+          labelText: 'Создать файл',
+          labelBackgroundColor: Color.fromARGB(255, 100, 100, 100),
+          labelColor: Colors.white,
+          currentButton: FloatingActionButton(
+            heroTag: 'Создать файл',
+            backgroundColor: Color.fromARGB(255, 0, 185, 0),
+            mini: true,
+            child: Icon(Icons.insert_drive_file_outlined),
+            onPressed: () {
+              print('Создать файл');
+            },
+          ),
+        ),
+      );
+    }
+
+    floatingButtons.add(
+      UnicornButton(
+        hasLabel: true,
+        labelText: "Создать папку",
+        labelBackgroundColor: Color.fromARGB(255, 100, 100, 100),
+        labelColor: Colors.white,
+        currentButton: FloatingActionButton(
+          heroTag: "Создать папку",
+          backgroundColor: Color.fromARGB(255, 0, 185, 0),
+          mini: true,
+          child: Icon(Icons.folder_open),
+          onPressed: () {
+            print('Создать папку');
+          },
+        ),
+      )
+    );
 
     return Scaffold(
+      floatingActionButton: UnicornDialer(
+        backgroundColor: Colors.transparent,
+        parentButtonBackground: Color.fromARGB(255, 0, 185, 0),
+        orientation: UnicornOrientation.VERTICAL,
+        parentButton: Icon(Icons.add),
+        childButtons: floatingButtons
+      ),
       appBar: AppBar(
-        title: Text('Открыть файл'),
+        title: Text(filesAction),
         actions: [
           PopupMenuButton<SoftTrackRadioMenuItem>(
             itemBuilder: (BuildContext context) {
@@ -185,7 +305,41 @@ class _OpenFilePageState extends State<OpenFilePage> {
           )
         ]
       ),
-      body: SingleChildScrollView(
+      body: FutureBuilder(
+        future: getFiles(),
+        builder: (BuildContext context, AsyncSnapshot<List<FileSystemEntity>> snapshot) {
+          int snapshotsCount = 0;
+          if (snapshot.data != null) {
+            snapshotsCount = snapshot.data!.length;
+            files = [];
+            for (int snapshotIndex = 0; snapshotIndex < snapshotsCount; snapshotIndex++) {
+              addFile(snapshot.data!.elementAt(snapshotIndex), context);
+            }
+          }
+          if (snapshot.hasData) {
+            return Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(
+                    25
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: files
+                    )
+                  )
+                )
+              ]
+            );
+          } else {
+            return Column(
+
+            );
+          }
+          return Column(
+
+          );
+        }
       )
     );
   }

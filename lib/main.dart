@@ -1430,15 +1430,36 @@ class _MyHomePageState extends State<MyHomePage> {
                 if (menuItemName.content == 'Создать') {
                   createFile();
                 } else if (menuItemName.content == 'Открыть') {
-                  Navigator.pushNamed(context, '/file/open');
+                  // Navigator.pushNamed(context, '/file/open');
+                  Navigator.pushNamed(
+                    context,
+                    '/file/open',
+                    arguments: {
+                      'filesAction': 'Открыть файл'
+                    }
+                  );
                 } else if (menuItemName.content == 'Открыть (SAF)') {
-                  Navigator.pushNamed(context, '/file/open');
+                  // Navigator.pushNamed(context, '/file/open');
+                  Navigator.pushNamed(
+                      context,
+                      '/file/open',
+                      arguments: {
+                        'filesAction': 'Открыть файл'
+                      }
+                  );
                 } else if (menuItemName.content == 'Сохранить') {
                   if (isDetectChanges) {
                     openSaveDialog(context);
                   }
                 } else if (menuItemName.content == 'Сохранить как') {
-                  Navigator.pushNamed(context, '/file/open');
+                  // Navigator.pushNamed(context, '/file/open');
+                  Navigator.pushNamed(
+                    context,
+                    '/file/open',
+                    arguments: {
+                      'filesAction': 'Сохранить как'
+                    }
+                  );
                 } else if (menuItemName.content == 'Перезагрузить') {
                   SystemNavigator.pop();
                   exit(0);
@@ -1613,7 +1634,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       Icons.folder
                     ),
                     onPressed: () {
-                      Navigator.pushNamed(context, '/file/open');
+                      // Navigator.pushNamed(context, '/file/open');
+                      Navigator.pushNamed(
+                        context,
+                        '/file/open',
+                        arguments: {
+                          'filesAction': 'Открыть файл'
+                        }
+                      );
                     },
                     style: ButtonStyle(
                       foregroundColor: MaterialStateProperty.all<Color>(
@@ -1790,7 +1818,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       ]
                     ),
                     onPressed: () {
-                      Navigator.pushNamed(context, '/file/open');
+                      // Navigator.pushNamed(context, '/file/open');
+                      Navigator.pushNamed(
+                        context,
+                        '/file/open',
+                        arguments: {
+                          'filesAction': 'Открыть файл'
+                        }
+                      );
                     }
                   ),
                   TextButton(
@@ -1896,8 +1931,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         )
                       ]
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       // Убрать рекламу
+                      final String url = 'market://details?id=com.google.android.youtube';
+                      if (await canLaunch(url))
+                        await launch(url);
                     }
                   ),
                   TextButton(
