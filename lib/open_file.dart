@@ -33,6 +33,9 @@ class _OpenFilePageState extends State<OpenFilePage> {
   String currentPath = '';
   String filesAction = '';
   List<Widget> files = [];
+  String createdFolderName = '';
+  String createdFileName = '';
+  String savedFileName = '';
   late DatabaseHandler handler;
 
   Future<String> get _localPath async {
@@ -45,6 +48,49 @@ class _OpenFilePageState extends State<OpenFilePage> {
     Directory dir = new Directory(appDir);
     Stream<FileSystemEntity> stream = dir.list();
     return stream.toList();
+  }
+
+  addSavedFile(FileSystemEntity record, context) {
+    String filePath = record.path;
+    String fileName = basename(filePath);
+    int fileSize = 0;
+    File rawFile = File(filePath);
+    bool isDir = new Directory(filePath).existsSync();
+    bool isNotDir = !isDir;
+    if (isNotDir) {
+      fileSize = rawFile.lengthSync();
+    }
+    GestureDetector file = GestureDetector(
+      child: Container(
+        height: 65,
+        width: 200,
+        child: Row(
+          children: [
+            Icon(
+              Icons.folder,
+              size: 36
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '${fileName}'
+                ),
+                Text(
+                  '$fileSize'
+                )
+              ]
+            )
+          ]
+        )
+      ),
+      onTap: () {
+        setState(() {
+          savedFileName = fileName;
+        });
+      }
+    );
+    files.add(file);
   }
 
   openAddBookmarkDialog(context) {
@@ -103,6 +149,211 @@ class _OpenFilePageState extends State<OpenFilePage> {
     );
   }
 
+  openCreateFolderDialog(context) {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Создать папку'),
+        content: Container(
+          child: Column(
+            children: [
+              Text(
+                'Введите имя папки'
+              ),
+              TextField(
+                onChanged: (value) {
+                  setState(() {
+                    createdFolderName = value;
+                  });
+                },
+                decoration: new InputDecoration.collapsed(
+                  hintText: '',
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      width: 0.0,
+                      color: Colors.transparent,
+                      style: BorderStyle.none
+                    )
+                  )
+                )
+              )
+            ]
+          )
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              return Navigator.pop(context, 'Cancel');
+            },
+            child: const Text('ОТМЕНА')
+          ),
+          TextButton(
+            onPressed: () async {
+              String appDir = await _localPath;
+              String folderPath = '${appDir}/${createdFolderName}';
+              var myFolder = new Directory(folderPath);
+              myFolder.createSync();
+              return Navigator.pop(context, 'OK');
+            },
+            child: const Text('ОК')
+          )
+        ]
+      )
+    );
+  }
+
+  openSaveAsDialog(context) {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Сохранить'),
+        content: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'storage/emulated/0'
+                ),
+                Icon(
+                  Icons.home
+                )
+              ]
+            ),
+            FutureBuilder(
+              future: getFiles(),
+              builder: (BuildContext context, AsyncSnapshot<List<FileSystemEntity>> snapshot) {
+                int snapshotsCount = 0;
+                if (snapshot.data != null) {
+                  snapshotsCount = snapshot.data!.length;
+                  files = [];
+                  for (int snapshotIndex = 0; snapshotIndex < snapshotsCount; snapshotIndex++) {
+                    addSavedFile(snapshot.data!.elementAt(snapshotIndex), context);
+                  }
+                }
+                if (snapshot.hasData) {
+                  return Column(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(
+                          25
+                        ),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: files
+                          )
+                        )
+                      )
+                    ]
+                  );
+                } else {
+                  return Column(
+
+                  );
+                }
+                return Column(
+
+                );
+              }
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                    'Имя файла'
+                ),
+                Container(
+                  width: 120,
+                  child: TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        savedFileName = value;
+                      });
+                    },
+                  )
+                )
+              ]
+            )
+          ]
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              return Navigator.pop(context, 'Cancel');
+            },
+            child: const Text('Отмена')
+          ),
+          TextButton(
+            onPressed: () async {
+              String appDir = await _localPath;
+              String filePath = '${appDir}/${savedFileName}';
+              var myFile = new File(filePath);
+              myFile.createSync();
+              myFile.writeAsString("abc");
+              return Navigator.pop(context, 'OK');
+            },
+            child: const Text('Сохранить')
+          ),
+        ]
+      )
+    );
+  }
+
+  openCreateFileDialog(context) {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Создать файл'),
+        content: Container(
+          child: Column(
+            children: [
+              Text(
+                'Введите имя файла'
+              ),
+              TextField(
+                onChanged: (value) {
+                  setState(() {
+                    createdFileName = value;
+                  });
+                },
+                decoration: new InputDecoration.collapsed(
+                  hintText: '',
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      width: 0.0,
+                      color: Colors.transparent,
+                      style: BorderStyle.none
+                    )
+                  )
+                )
+              )
+            ]
+          )
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              return Navigator.pop(context, 'Cancel');
+            },
+            child: const Text('ОТМЕНА')
+          ),
+          TextButton(
+            onPressed: () async {
+              String appDir = await _localPath;
+              String filePath = '${appDir}/${createdFileName}';
+              var myFile = new File(filePath);
+              myFile.createSync();
+              myFile.writeAsString('');
+              return Navigator.pop(context, 'OK');
+            },
+            child: const Text('ОК')
+          )
+        ]
+      )
+    );
+  }
+
   addFile(FileSystemEntity record, context) {
     String filePath = record.path;
     String fileName = basename(filePath);
@@ -113,32 +364,43 @@ class _OpenFilePageState extends State<OpenFilePage> {
     if (isNotDir) {
       fileSize = rawFile.lengthSync();
     }
-    Container file = Container(
-      height: 65,
-      child: Row(
-        children: [
-          Icon(
-            Icons.folder,
-            size: 36
-          ),
-          Container(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '${fileName}'
-                ),
-                Text(
-                  '$fileSize'
-                )
-              ]
+    GestureDetector file = GestureDetector(
+      child: Container(
+        height: 65,
+        child: Row(
+          children: [
+            Icon(
+              Icons.folder,
+              size: 36
             ),
-            margin: EdgeInsets.only(
-              left: 15
+            Container(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '${fileName}'
+                  ),
+                  Text(
+                    '$fileSize'
+                  )
+                ]
+              ),
+              margin: EdgeInsets.only(
+                left: 15
+              )
             )
-          )
-        ]
-      )
+          ]
+        )
+      ),
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          '/main',
+          arguments: {
+            'filePath': filePath
+          }
+        );
+      }
     );
     files.add(file);
   }
@@ -156,6 +418,7 @@ class _OpenFilePageState extends State<OpenFilePage> {
 
   @override
   Widget build(BuildContext context) {
+
     final arguments = ModalRoute.of(context)!.settings.arguments as Map;
     if (arguments != null) {
       print(arguments['filesAction']);
@@ -176,6 +439,7 @@ class _OpenFilePageState extends State<OpenFilePage> {
             child: Icon(Icons.save),
             onPressed: () {
               print('Сохранить как');
+              openSaveAsDialog(context);
             },
           ),
         ),
@@ -194,6 +458,7 @@ class _OpenFilePageState extends State<OpenFilePage> {
             child: Icon(Icons.insert_drive_file_outlined),
             onPressed: () {
               print('Создать файл');
+              openCreateFileDialog(context);
             },
           ),
         ),
@@ -213,6 +478,7 @@ class _OpenFilePageState extends State<OpenFilePage> {
           child: Icon(Icons.folder_open),
           onPressed: () {
             print('Создать папку');
+            openCreateFolderDialog(context);
           },
         ),
       )

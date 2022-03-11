@@ -76,7 +76,7 @@ class _MemoryManagerPageState extends State<MemoryManagerPage> {
     floatingButtons.add(
       UnicornButton(
         hasLabel: true,
-        labelText: "Goolge Drive",
+        labelText: "Google Drive",
         labelBackgroundColor: Color.fromARGB(255, 100, 100, 100),
         labelColor: Colors.white,
         currentButton: FloatingActionButton(

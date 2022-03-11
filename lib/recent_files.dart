@@ -1,3 +1,4 @@
+// import 'dart:html' as html;
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -109,23 +110,35 @@ class _RecentFilesPageState extends State<RecentFilesPage> {
                   snapshotsCount = snapshot.data!.length;
                   files = [];
                   for (int snapshotIndex = 0; snapshotIndex < snapshotsCount; snapshotIndex++) {
-                    addFile(snapshot.data!.elementAt(snapshotIndex), context);
+                    var snapshotData = snapshot.data!;
+                    FileSystemEntity snapshotDataItem = snapshotData.elementAt(snapshotIndex);
+                    String filePath = snapshotDataItem.path;
+                    File file = new File(filePath);
+                    DateTime fileLastModified = file.lastModifiedSync();
+                    DateTime currentDateTime = DateTime.now();
+                    currentDateTime = currentDateTime.subtract(Duration(
+                      days: 2
+                    ));
+                    bool isRecentOpened = fileLastModified.isAfter(currentDateTime);
+                    if (isRecentOpened) {
+                      addFile(snapshotDataItem, context);
+                    }
                   }
                 }
                 if (snapshot.hasData) {
                   return Column(
-                      children: [
-                        Container(
-                            padding: EdgeInsets.all(
-                                25
-                            ),
-                            child: SingleChildScrollView(
-                                child: Column(
-                                    children: files
-                                )
-                            )
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(
+                          25
+                        ),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: files
+                          )
                         )
-                      ]
+                      )
+                    ]
                   );
                 } else {
                   return Column(
@@ -145,23 +158,35 @@ class _RecentFilesPageState extends State<RecentFilesPage> {
                   snapshotsCount = snapshot.data!.length;
                   files = [];
                   for (int snapshotIndex = 0; snapshotIndex < snapshotsCount; snapshotIndex++) {
-                    addFile(snapshot.data!.elementAt(snapshotIndex), context);
+                    var snapshotData = snapshot.data!;
+                    FileSystemEntity snapshotDataItem = snapshotData.elementAt(snapshotIndex);
+                    String filePath = snapshotDataItem.path;
+                    File file = new File(filePath);
+                    DateTime fileLastModified = file.lastModifiedSync();
+                    DateTime currentDateTime = DateTime.now();
+                    currentDateTime = currentDateTime.subtract(Duration(
+                        days: 2
+                    ));
+                    bool isRecentAdded = fileLastModified.isAfter(currentDateTime);
+                    if (isRecentAdded) {
+                      addFile(snapshotDataItem, context);
+                    }
                   }
                 }
                 if (snapshot.hasData) {
                   return Column(
-                      children: [
-                        Container(
-                            padding: EdgeInsets.all(
-                                25
-                            ),
-                            child: SingleChildScrollView(
-                                child: Column(
-                                    children: files
-                                )
-                            )
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(
+                          25
+                        ),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: files
+                          )
                         )
-                      ]
+                      )
+                    ]
                   );
                 } else {
                   return Column(
