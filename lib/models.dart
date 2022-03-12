@@ -67,3 +67,49 @@ enum StyleType {
   AtelierSeaside,
   AtelierSulphurpool
 }
+
+enum LangType {
+  auto,
+  rus,
+  eng
+}
+
+enum BreakLineType {
+  auto,
+  linux,
+  windows,
+  macos
+}
+
+enum ParagraphCharType {
+  tab,
+  spaceChars
+}
+
+enum HintsType {
+  enabled,
+  disabled,
+  fullDisabled
+}
+
+enum FontFamilyType {
+  normal,
+  sansSerif,
+  serif,
+  monospace,
+  external
+}
+
+enum AutoSaveIntervalType {
+  mins0secondss30,
+  mins1,
+  mins3,
+  mins5,
+  mins10
+}
+
+enum ThemeType {
+  light,
+  dark,
+  black
+}
