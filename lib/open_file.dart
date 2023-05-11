@@ -421,7 +421,6 @@ class _OpenFilePageState extends State<OpenFilePage> {
 
     final arguments = ModalRoute.of(context)!.settings.arguments as Map;
     if (arguments != null) {
-      print(arguments['filesAction']);
       filesAction = arguments['filesAction'];
     }
     final List<UnicornButton> floatingButtons = [];
@@ -438,7 +437,6 @@ class _OpenFilePageState extends State<OpenFilePage> {
             mini: true,
             child: Icon(Icons.save),
             onPressed: () {
-              print('Сохранить как');
               openSaveAsDialog(context);
             },
           ),
@@ -457,7 +455,6 @@ class _OpenFilePageState extends State<OpenFilePage> {
             mini: true,
             child: Icon(Icons.insert_drive_file_outlined),
             onPressed: () {
-              print('Создать файл');
               openCreateFileDialog(context);
             },
           ),
@@ -477,7 +474,6 @@ class _OpenFilePageState extends State<OpenFilePage> {
           mini: true,
           child: Icon(Icons.folder_open),
           onPressed: () {
-            print('Создать папку');
             openCreateFolderDialog(context);
           },
         ),

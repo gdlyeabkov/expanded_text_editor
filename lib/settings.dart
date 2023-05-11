@@ -428,23 +428,6 @@ class _SettingsPageState extends State<SettingsPage> {
                                 ),
                                 Row(
                                   children: [
-                                    // TextField(
-                                    //   onChanged: (value) {
-                                    //     setState(() {
-                                    //       paragraphCharSpacesCount = value;
-                                    //     });
-                                    //   },
-                                    //   decoration: new InputDecoration.collapsed(
-                                    //     hintText: '',
-                                    //     border: OutlineInputBorder(
-                                    //       borderSide: BorderSide(
-                                    //         width: 0.0,
-                                    //         color: Colors.transparent,
-                                    //         style: BorderStyle.none
-                                    //       )
-                                    //     )
-                                    //   )
-                                    // ),
                                     Text(
                                       'знака(ов) пробела'
                                     ),

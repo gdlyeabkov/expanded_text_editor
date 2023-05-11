@@ -1,4 +1,3 @@
-// import 'dart:html' as html;
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -85,7 +84,6 @@ class _RecentFilesPageState extends State<RecentFilesPage> {
           title: Text('Недавние файлы'),
           bottom: TabBar(
             onTap: (index) {
-              print('currentTabIndex: ${index}');
               setState(() {
                 currentTab = index;
               });

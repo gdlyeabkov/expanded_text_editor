@@ -29,7 +29,6 @@ class _MemoryManagerPageState extends State<MemoryManagerPage> {
           mini: true,
           child: Icon(Icons.graphic_eq),
           onPressed: () {
-            print('FTP/FTPS/SFTP');
           },
         ),
       ),
@@ -46,7 +45,6 @@ class _MemoryManagerPageState extends State<MemoryManagerPage> {
           mini: true,
           child: Icon(Icons.circle),
           onPressed: () {
-            print('Attachment FAB clicked');
           },
         ),
       ),
@@ -68,7 +66,6 @@ class _MemoryManagerPageState extends State<MemoryManagerPage> {
             color: Colors.white
           ),
           onPressed: () {
-            print('Attachment FAB clicked');
           },
         ),
       ),
@@ -90,7 +87,6 @@ class _MemoryManagerPageState extends State<MemoryManagerPage> {
             color: Colors.white
           ),
           onPressed: () {
-            print('Attachment FAB clicked');
           },
         ),
       ),
@@ -112,7 +108,6 @@ class _MemoryManagerPageState extends State<MemoryManagerPage> {
             color: Colors.white
           ),
           onPressed: () {
-            print('Attachment FAB clicked');
           },
         ),
       ),
@@ -125,7 +120,6 @@ class _MemoryManagerPageState extends State<MemoryManagerPage> {
         labelColor: Colors.white,
         currentButton: FloatingActionButton(
           onPressed: () {
-            print('Camera FAB clicked');
           },
           heroTag: "camera",
           backgroundColor: Color.fromARGB(255, 0, 185, 0),
@@ -147,7 +141,6 @@ class _MemoryManagerPageState extends State<MemoryManagerPage> {
         labelColor: Colors.white,
         currentButton: FloatingActionButton(
           onPressed: () {
-            print('Note FAB clicked');
           },
           heroTag: "note",
           backgroundColor: Color.fromARGB(255, 0, 185, 0),
@@ -196,7 +189,6 @@ class _MemoryManagerPageState extends State<MemoryManagerPage> {
                 ]
               ),
               onTap: () {
-                // Navigator.pushNamed(context, '/file/open');
                 Navigator.pushNamed(
                   context,
                   '/file/open',

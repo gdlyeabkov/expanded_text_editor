@@ -17,7 +17,7 @@ class _HelpPageState extends State<HelpPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Softtrack Текстовый редактор'),
+        title: Text('Текстовый редактор'),
         actions: [
           FlatButton(
             onPressed: () {
@@ -34,7 +34,7 @@ class _HelpPageState extends State<HelpPage> {
           child: Column(
             children: [
               Text(
-                'Softtrack текстовый редактор',
+                'текстовый редактор',
                 style: TextStyle(
                   color: Color.fromARGB(255, 150, 150, 150),
                   fontSize: 24
@@ -43,7 +43,7 @@ class _HelpPageState extends State<HelpPage> {
               ),
               Container(
                 child: Text(
-                  'Добро пожаловать в Softtrack текстовый\nредактор справочныйцентр.',
+                  'Добро пожаловать в текстовый\nредактор справочныйцентр.',
                   style: TextStyle(
                     fontSize: 18
                   )

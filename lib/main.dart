@@ -11,7 +11,6 @@ import 'package:texteditor/recent_files.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:intl/intl.dart';
-// import 'package:utf/utf.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:texteditor/settings.dart';
@@ -38,11 +37,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Softtrack Текстовый редактор',
+      title: 'Текстовый редактор',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Softtrack Текстовый редактор'),
+      home: const MyHomePage(title: 'Текстовый редактор'),
       routes: {
         '/main': (context) => MyHomePage(title: 'title'),
         '/file/open': (context) => OpenFilePage(title: 'title'),
@@ -113,7 +112,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Color pickerColor = Colors.black;
   StyleType selectedStyle = StyleType.Default;
   EncodingType selectedEncoding = EncodingType.utf16be;
-  int tabsCount = 2;
+  int tabsCount = 1;
   String savedFileName = '';
   bool isDetectChanges = false;
   List monthLabels = [
@@ -242,11 +241,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     createFile() async {
-      /*String appDir = await _localPath;
-     String filePath = '${appDir}/flutter_text_plain_2.txt';
-     var myFile = new File(filePath);
-     myFile.createSync();
-     myFile.writeAsString("abc");*/
+      // TODO
     }
 
     openFindDialog(context) {
@@ -420,21 +415,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if (isAddPrefix) {
         rawCurrentDateMonth = '0${rawCurrentDateMonth}';
       }
-      /*int rawCurrentDateHoursLength = rawCurrentDateHours.length;
-    isAddPrefix = rawCurrentDateHoursLength < 10;
-    if (isAddPrefix) {
-      rawCurrentDateHours = '0${rawCurrentDateHours}';
-    }
-    int rawCurrentDateMinutesLength = rawCurrentDateMinutes.length;
-    isAddPrefix = rawCurrentDateMinutesLength < 10;
-    if (isAddPrefix) {
-      rawCurrentDateMinutes = '0${rawCurrentDateMinutes}';
-    }
-    int rawCurrentDateSecondsLength = rawCurrentDateSeconds.length;
-    isAddPrefix = rawCurrentDateSecondsLength < 10;
-    if (isAddPrefix) {
-      rawCurrentDateSeconds = '0${rawCurrentDateSeconds}';
-    }*/
+
       int currentDateMonthIndex = currentDateMonth - 1;
       String monthLabel = monthLabels[currentDateMonthIndex];
       String currentDateFormat = DateFormat('a').format(currentDate);
@@ -745,7 +726,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       Color hexColor = ColorToHex(pickerColor);
                       String rawHexColor = hexColor.toString();
                       String hexColorCode = rawHexColor.substring(8, 16);
-                      print('hexColorCode: ${hexColorCode}');
                       setState(() {
                         mainTextAreaContent += hexColorCode;
                         mainTextAreaController.text = mainTextAreaContent;
@@ -1544,13 +1524,11 @@ class _MyHomePageState extends State<MyHomePage> {
       bool isNotPostInit = !isPostInit;
       bool isCanPostInit = isNotPostInit && isArgumentsExists;
       if (isCanPostInit) {
-        print(arguments['filePath']);
         String filePath = arguments['filePath'];
         var myFile = new File(filePath);
         myFile.readAsString().then((value) {
           String fileName = basename(filePath);
           setState(() {
-            print('value: $value, fileName: $fileName');
             mainTextAreaContent = value;
             mainTextAreaController.text = mainTextAreaContent;
             openedDocumentsHeader = fileName;
@@ -1609,14 +1587,6 @@ class _MyHomePageState extends State<MyHomePage> {
                               }
                           );
                         } else if (menuItemName.content == 'Открыть (SAF)') {
-                          // Navigator.pushNamed(context, '/file/open');
-                          // Navigator.pushNamed(
-                          //     context,
-                          //     '/file/open',
-                          //     arguments: {
-                          //       'filesAction': 'Открыть файл'
-                          //     }
-                          // );
                           android_intent.Intent()
                             ..setAction(android_action.Action.ACTION_OPEN_DOCUMENT)
                             ..addCategory(Category.CATEGORY_OPENABLE)
@@ -1784,7 +1754,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
                 bottom: TabBar(
                     onTap: (index) {
-                      print('currentTabIndex: ${index}');
                       setState(() {
                         currentTab = index;
                       });
@@ -1792,9 +1761,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     tabs: <Widget>[
                       Tab(
                           text: getOpenedDocumentsHeader
-                      ),
-                      Tab(
-                          text: 'Database Inspector'
                       )
                     ]
                 )
@@ -1922,19 +1888,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                   child: Column(
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
-                                        /*List.generate(numLines, (index) {
-                          return Text(
-                              '1'
-                          );
-                        })*/
-                                        /*ListView.builder(
-                          itemBuilder: (BuildContext context, int index) {
-                            return Text(
-                              '1'
-                            );
-                          },
-                          itemCount: numLines
-                        )*/
                                         FutureBuilder(
                                           future: getLines(),
                                           builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
@@ -1959,14 +1912,6 @@ class _MyHomePageState extends State<MyHomePage> {
                               ]
                           )
                       )
-                  ),
-                  TextButton(
-                      child: Text(
-                          'Database Inspector'
-                      ),
-                      onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => DatabaseList()));
-                      }
                   )
                 ]
             ),
@@ -2001,7 +1946,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                     ]
                                 ),
                                 onPressed: () {
-                                  // Navigator.pushNamed(context, '/file/open');
                                   Navigator.pushNamed(
                                       context,
                                       '/file/open',
